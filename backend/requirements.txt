@@ -1,6 +1,0 @@
-# backend/requirements-dev.txt
-black
-ruff
-isort
-pytest
-pre-commit
