@@ -1,0 +1,25 @@
+services:
+  backend:
+    build: ./backend
+    ports:
+      - "8000:8000"
+    environment:
+      - ENV=development
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: vulnintel
+      POSTGRES_PASSWORD: vulnpass
+      POSTGRES_DB: vulnintel
+    ports:
+      - "5432:5432"
+    # volumes:
+    #   - pgdata:/var/lib/postgresql/data
+  redis:
+    image: redis:7
+    ports:
+      - "6379:6379"
+
+#volumes:
+#  pgdata:
+#    driver: local
