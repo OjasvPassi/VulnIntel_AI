@@ -1,39 +1,22 @@
 from typing import List
 
+from app.api import crud_cve
+from app.core.db import get_db
 from app.models.cve_model import CVE
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy.orm import Session
 
 router = APIRouter()
 
-# mock dataset
-MOCK_CVES = [
-    CVE(
-        id="CVE-2024-0001",
-        description="Example buffer overflow in sample library.",
-        severity="High",
-        cvss_score=8.5,
-        references=["https://nvd.nist.gov/vuln/detail/CVE-2024-0001"],
-    ),
-    CVE(
-        id="CVE-2024-0002",
-        description="Cross-site scripting vulnerability in webapp.",
-        severity="Medium",
-        cvss_score=6.3,
-        references=["https://nvd.nist.gov/vuln/detail/CVE-2024-0002"],
-    ),
-]
-
 
 @router.get("/cves", response_model=List[CVE])
-async def list_cves():
-    """Return mock list of CVEs."""
-    return MOCK_CVES
+def list_cves(db: Session = Depends(get_db)):
+    return crud_cve.get_all_cves(db)
 
 
 @router.get("/cve/{cve_id}", response_model=CVE)
-async def get_cve(cve_id: str):
-    """Return single CVE by ID."""
-    for cve in MOCK_CVES:
-        if cve.id == cve_id:
-            return cve
-    raise HTTPException(status_code=404, detail="CVE not found")
+def get_cve(cve_id: str, db: Session = Depends(get_db)):
+    cve = crud_cve.get_cve_by_id(db, cve_id)
+    if not cve:
+        raise HTTPException(status_code=404, detail="CVE not found")
+    return cve
